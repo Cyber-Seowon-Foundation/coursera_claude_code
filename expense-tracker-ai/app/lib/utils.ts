@@ -1,0 +1,131 @@
+import { Expense, Category, ExpenseFilters } from "@/app/types/expense";
+import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
+
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount);
+}
+
+export function formatDate(dateStr: string): string {
+  try {
+    return format(parseISO(dateStr), "MMM d, yyyy");
+  } catch {
+    return dateStr;
+  }
+}
+
+export function generateId(): string {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+export function filterExpenses(expenses: Expense[], filters: ExpenseFilters): Expense[] {
+  return expenses.filter((expense) => {
+    if (filters.category !== "All" && expense.category !== filters.category) return false;
+
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      if (
+        !expense.description.toLowerCase().includes(q) &&
+        !expense.category.toLowerCase().includes(q)
+      )
+        return false;
+    }
+
+    if (filters.dateFrom) {
+      if (expense.date < filters.dateFrom) return false;
+    }
+
+    if (filters.dateTo) {
+      if (expense.date > filters.dateTo) return false;
+    }
+
+    return true;
+  });
+}
+
+export function getTotalSpending(expenses: Expense[]): number {
+  return expenses.reduce((sum, e) => sum + e.amount, 0);
+}
+
+export function getMonthlySpending(expenses: Expense[]): number {
+  const now = new Date();
+  const start = startOfMonth(now);
+  const end = endOfMonth(now);
+  return expenses
+    .filter((e) => {
+      try {
+        return isWithinInterval(parseISO(e.date), { start, end });
+      } catch {
+        return false;
+      }
+    })
+    .reduce((sum, e) => sum + e.amount, 0);
+}
+
+export function getSpendingByCategory(
+  expenses: Expense[]
+): { category: Category; amount: number; percentage: number }[] {
+  const totals: Partial<Record<Category, number>> = {};
+  expenses.forEach((e) => {
+    totals[e.category] = (totals[e.category] ?? 0) + e.amount;
+  });
+  const total = getTotalSpending(expenses);
+  return Object.entries(totals)
+    .map(([category, amount]) => ({
+      category: category as Category,
+      amount: amount ?? 0,
+      percentage: total > 0 ? ((amount ?? 0) / total) * 100 : 0,
+    }))
+    .sort((a, b) => b.amount - a.amount);
+}
+
+export function getTopCategory(expenses: Expense[]): Category | null {
+  const breakdown = getSpendingByCategory(expenses);
+  return breakdown.length > 0 ? breakdown[0].category : null;
+}
+
+export function getMonthlyTrend(
+  expenses: Expense[]
+): { month: string; amount: number }[] {
+  const map: Record<string, number> = {};
+  expenses.forEach((e) => {
+    try {
+      const key = format(parseISO(e.date), "MMM yyyy");
+      map[key] = (map[key] ?? 0) + e.amount;
+    } catch {
+      // skip invalid dates
+    }
+  });
+
+  // Sort chronologically (last 6 months)
+  const entries = Object.entries(map)
+    .map(([month, amount]) => ({ month, amount }))
+    .sort((a, b) => {
+      const da = new Date(a.month);
+      const db = new Date(b.month);
+      return da.getTime() - db.getTime();
+    })
+    .slice(-6);
+
+  return entries;
+}
+
+export function exportToCSV(expenses: Expense[]): void {
+  const header = ["Date", "Category", "Amount", "Description"];
+  const rows = expenses.map((e) => [
+    e.date,
+    e.category,
+    e.amount.toFixed(2),
+    `"${e.description.replace(/"/g, '""')}"`,
+  ]);
+  const csv = [header, ...rows].map((r) => r.join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `expenses-${format(new Date(), "yyyy-MM-dd")}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
