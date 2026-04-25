@@ -2,20 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Wallet, Plus, Download, BarChart3 } from "lucide-react";
+import { Wallet, Plus, Download, BarChart3, Store } from "lucide-react";
 
 interface NavbarProps {
   onAddExpense?: () => void;
   onExport?: () => void;
 }
 
+const NAV_LINKS: { href: string; label: string; icon: typeof Store }[] = [
+  { href: "/", label: "Dashboard", icon: Wallet },
+  { href: "/top-categories", label: "Top Categories", icon: BarChart3 },
+  { href: "/top-vendors", label: "Top Vendors", icon: Store },
+];
+
 export default function Navbar({ onAddExpense, onExport }: NavbarProps) {
   const pathname = usePathname();
-
-  const navLinks = [
-    { href: "/", label: "Dashboard", icon: Wallet },
-    { href: "/top-categories", label: "Top Categories", icon: BarChart3 },
-  ];
 
   return (
     <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40">
@@ -32,41 +33,31 @@ export default function Navbar({ onAddExpense, onExport }: NavbarProps) {
         </Link>
 
         {/* Nav links */}
-        <nav className="hidden md:flex items-center gap-1 ml-4">
-          {navLinks.map((link) => {
+        <nav className="hidden md:flex items-center gap-1 ml-6">
+          {NAV_LINKS.map((link) => {
             const Icon = link.icon;
-            const isActive = pathname === link.href;
+            const isActive =
+              link.href === "/"
+                ? pathname === "/"
+                : pathname === link.href || pathname?.startsWith(`${link.href}/`);
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
                   isActive
                     ? "bg-indigo-50 text-indigo-700"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 }`}
               >
-                <Icon size={15} />
-                {link.label}
+                <Icon size={16} />
+                <span>{link.label}</span>
               </Link>
             );
           })}
         </nav>
 
         <div className="flex-1" />
-
-        {/* Mobile-only nav link to Top Categories */}
-        <Link
-          href="/top-categories"
-          aria-label="Top Categories"
-          className={`md:hidden flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-            pathname === "/top-categories"
-              ? "bg-indigo-50 text-indigo-700"
-              : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-          }`}
-        >
-          <BarChart3 size={15} />
-        </Link>
 
         {/* Actions */}
         {onExport && (

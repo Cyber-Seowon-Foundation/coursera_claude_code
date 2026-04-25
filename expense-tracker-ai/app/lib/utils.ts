@@ -86,6 +86,56 @@ export function getTopCategory(expenses: Expense[]): Category | null {
   return breakdown.length > 0 ? breakdown[0].category : null;
 }
 
+export interface VendorStats {
+  vendor: string;
+  total: number;
+  count: number;
+  average: number;
+}
+
+/**
+ * Group expenses by vendor (using the `description` field as vendor name),
+ * normalized case-insensitively and trimmed. The display name for each group
+ * is the most-recently-seen original spelling (by createdAt).
+ */
+export function getTopVendors(expenses: Expense[]): VendorStats[] {
+  const groups = new Map<
+    string,
+    { displayName: string; latest: string; total: number; count: number }
+  >();
+
+  for (const expense of expenses) {
+    const trimmed = expense.description.trim();
+    if (trimmed.length === 0) continue;
+    const key = trimmed.toLowerCase();
+    const existing = groups.get(key);
+    if (existing) {
+      existing.total += expense.amount;
+      existing.count += 1;
+      if (expense.createdAt > existing.latest) {
+        existing.displayName = trimmed;
+        existing.latest = expense.createdAt;
+      }
+    } else {
+      groups.set(key, {
+        displayName: trimmed,
+        latest: expense.createdAt,
+        total: expense.amount,
+        count: 1,
+      });
+    }
+  }
+
+  return Array.from(groups.values())
+    .map(({ displayName, total, count }) => ({
+      vendor: displayName,
+      total,
+      count,
+      average: count > 0 ? total / count : 0,
+    }))
+    .sort((a, b) => b.total - a.total);
+}
+
 export function getMonthlyTrend(
   expenses: Expense[]
 ): { month: string; amount: number }[] {
