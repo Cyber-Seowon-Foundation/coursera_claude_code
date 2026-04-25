@@ -63,11 +63,13 @@ export default function Home() {
   }
 
   function handleExport() {
-    if (expenses.length === 0) {
+    const expensesToExport =
+      filteredExpenses.length < expenses.length ? filteredExpenses : expenses;
+    if (expensesToExport.length === 0) {
       showToast("No expenses to export", "error");
       return;
     }
-    exportToCSV(filteredExpenses.length < expenses.length ? filteredExpenses : expenses);
+    exportToCSV(expensesToExport);
     showToast("CSV exported");
   }
 

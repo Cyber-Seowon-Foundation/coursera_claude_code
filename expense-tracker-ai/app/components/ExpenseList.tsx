@@ -20,16 +20,26 @@ function DeleteConfirm({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const titleId = `delete-expense-title-${expense.id}`;
+  const descId = `delete-expense-desc-${expense.id}`;
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Expense?</h3>
-        <p className="text-sm text-gray-500 mb-1">
-          <span className="font-medium text-gray-700">{expense.description}</span>
-        </p>
-        <p className="text-sm text-gray-400 mb-6">
-          {formatCurrency(expense.amount)} · {formatDate(expense.date)}
-        </p>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={descId}
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6"
+      >
+        <h3 id={titleId} className="text-lg font-semibold text-gray-900 mb-2">Delete Expense?</h3>
+        <div id={descId}>
+          <p className="text-sm text-gray-500 mb-1">
+            <span className="font-medium text-gray-700">{expense.description}</span>
+          </p>
+          <p className="text-sm text-gray-400 mb-6">
+            {formatCurrency(expense.amount)} · {formatDate(expense.date)}
+          </p>
         <div className="flex gap-3">
           <button
             onClick={onCancel}
@@ -134,14 +144,14 @@ export default function ExpenseList({ expenses, onEdit, onDelete }: ExpenseListP
                         <button
                           onClick={() => onEdit(expense)}
                           className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                          title="Edit"
+                          aria-label="Edit"
                         >
                           <Pencil size={15} />
                         </button>
                         <button
                           onClick={() => setConfirmDelete(expense)}
                           className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Delete"
+                          aria-label="Delete"
                         >
                           <Trash2 size={15} />
                         </button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Expense, CATEGORY_COLORS, Category } from "@/app/types/expense";
+import { Expense, CATEGORY_COLORS } from "@/app/types/expense";
 import { getSpendingByCategory, getMonthlyTrend, formatCurrency } from "@/app/lib/utils";
 import {
   BarChart,

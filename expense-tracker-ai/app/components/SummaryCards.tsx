@@ -6,7 +6,6 @@ import {
   getTotalSpending,
   getMonthlySpending,
   getTopCategory,
-  getSpendingByCategory,
 } from "@/app/lib/utils";
 import { TrendingUp, Calendar, Tag, Receipt } from "lucide-react";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Expense, CATEGORY_COLORS, CATEGORY_ICONS, Category } from "@/app/types/expense";
+import { Expense, CATEGORY_COLORS, CATEGORY_ICONS } from "@/app/types/expense";
 import { getSpendingByCategory, formatCurrency } from "@/app/lib/utils";
 
 interface CategoryBreakdownProps {

@@ -56,15 +56,23 @@ export default function ExpenseForm({ onSubmit, onCancel, initialData }: Expense
     });
   }
 
+  const titleId = "expense-form-title";
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-md"
+      >
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 id={titleId} className="text-xl font-semibold text-gray-900">
             {initialData ? "Edit Expense" : "Add Expense"}
           </h2>
           <button
             onClick={onCancel}
+            aria-label="Close"
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <X size={20} />

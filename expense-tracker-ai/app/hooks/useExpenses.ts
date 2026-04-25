@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Expense, ExpenseFilters, Category } from "@/app/types/expense";
+import { Expense, ExpenseFilters } from "@/app/types/expense";
 import {
   loadExpenses,
   addExpense as storageAdd,

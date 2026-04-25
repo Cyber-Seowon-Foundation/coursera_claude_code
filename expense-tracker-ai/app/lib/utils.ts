@@ -92,7 +92,7 @@ export function getMonthlyTrend(
   const map: Record<string, number> = {};
   expenses.forEach((e) => {
     try {
-      const key = format(parseISO(e.date), "MMM yyyy");
+      const key = format(parseISO(e.date), "yyyy-MM");
       map[key] = (map[key] ?? 0) + e.amount;
     } catch {
       // skip invalid dates
@@ -101,15 +101,21 @@ export function getMonthlyTrend(
 
   // Sort chronologically (last 6 months)
   const entries = Object.entries(map)
-    .map(([month, amount]) => ({ month, amount }))
-    .sort((a, b) => {
-      const da = new Date(a.month);
-      const db = new Date(b.month);
-      return da.getTime() - db.getTime();
-    })
-    .slice(-6);
+    .map(([isoKey, amount]) => ({
+      month: format(parseISO(`${isoKey}-01`), "MMM yyyy"),
+      amount,
+      isoKey,
+    }))
+    .sort((a, b) => a.isoKey.localeCompare(b.isoKey))
+    .slice(-6)
+    .map(({ month, amount }) => ({ month, amount }));
 
   return entries;
+}
+
+function escapeCSVTextCell(value: string): string {
+  const sanitized = /^[=+\-@]/.test(value) ? `'${value}` : value;
+  return `"${sanitized.replace(/"/g, '""')}"`;
 }
 
 export function exportToCSV(expenses: Expense[]): void {
@@ -118,7 +124,7 @@ export function exportToCSV(expenses: Expense[]): void {
     e.date,
     e.category,
     e.amount.toFixed(2),
-    `"${e.description.replace(/"/g, '""')}"`,
+    escapeCSVTextCell(e.description),
   ]);
   const csv = [header, ...rows].map((r) => r.join(",")).join("\n");
   const blob = new Blob([csv], { type: "text/csv" });
@@ -126,6 +132,10 @@ export function exportToCSV(expenses: Expense[]): void {
   const a = document.createElement("a");
   a.href = url;
   a.download = `expenses-${format(new Date(), "yyyy-MM-dd")}.csv`;
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 0);
 }

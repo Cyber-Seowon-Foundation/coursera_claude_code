@@ -27,6 +27,7 @@ export default function Navbar({ onAddExpense, onExport }: NavbarProps) {
         {/* Actions */}
         <button
           onClick={onExport}
+          aria-label="Export CSV"
           className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl text-sm font-medium transition-colors"
         >
           <Download size={16} />
@@ -35,6 +36,7 @@ export default function Navbar({ onAddExpense, onExport }: NavbarProps) {
 
         <button
           onClick={onAddExpense}
+          aria-label="Add Expense"
           className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm"
         >
           <Plus size={16} />
