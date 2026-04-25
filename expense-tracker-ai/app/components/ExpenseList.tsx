@@ -40,6 +40,7 @@ function DeleteConfirm({
           <p className="text-sm text-gray-400 mb-6">
             {formatCurrency(expense.amount)} · {formatDate(expense.date)}
           </p>
+        </div>
         <div className="flex gap-3">
           <button
             onClick={onCancel}
