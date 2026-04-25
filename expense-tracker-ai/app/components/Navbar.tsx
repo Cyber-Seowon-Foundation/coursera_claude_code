@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Wallet, Plus, Download, BarChart3, Store } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 interface NavbarProps {
   onAddExpense?: () => void;
   onExport?: () => void;
 }
 
-const NAV_LINKS: { href: string; label: string; icon: typeof Store }[] = [
+const NAV_LINKS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/", label: "Dashboard", icon: Wallet },
   { href: "/top-categories", label: "Top Categories", icon: BarChart3 },
   { href: "/top-vendors", label: "Top Vendors", icon: Store },
@@ -32,8 +33,8 @@ export default function Navbar({ onAddExpense, onExport }: NavbarProps) {
           </div>
         </Link>
 
-        {/* Nav links */}
-        <nav className="hidden md:flex items-center gap-1 ml-6">
+        {/* Nav links — labels show on md+, icon-only on mobile */}
+        <nav className="flex items-center gap-1 ml-2 sm:ml-6">
           {NAV_LINKS.map((link) => {
             const Icon = link.icon;
             const isActive =
@@ -44,14 +45,16 @@ export default function Navbar({ onAddExpense, onExport }: NavbarProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
+                aria-label={link.label}
+                aria-current={isActive ? "page" : undefined}
+                className={`flex items-center gap-2 px-2.5 sm:px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
                   isActive
                     ? "bg-indigo-50 text-indigo-700"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 }`}
               >
                 <Icon size={16} />
-                <span>{link.label}</span>
+                <span className="hidden md:inline">{link.label}</span>
               </Link>
             );
           })}
