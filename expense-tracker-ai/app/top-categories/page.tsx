@@ -87,7 +87,7 @@ export default function TopCategoriesPage() {
         {/* Empty state */}
         {rows.length === 0 ? (
           <div className="bg-white rounded-2xl p-12 shadow-sm border border-gray-100 text-center">
-            <div className="text-5xl mb-3">📊</div>
+            <div aria-hidden="true" className="text-5xl mb-3">📊</div>
             <h2 className="text-lg font-semibold text-gray-900 mb-1">
               No expenses yet
             </h2>
@@ -144,7 +144,7 @@ export default function TopCategoriesPage() {
                             backgroundColor: CATEGORY_COLORS[row.category],
                           }}
                         />
-                        <span className="text-base">
+                        <span aria-hidden="true" className="text-base">
                           {CATEGORY_ICONS[row.category]}
                         </span>
                         <span className="text-sm font-medium text-gray-900">
